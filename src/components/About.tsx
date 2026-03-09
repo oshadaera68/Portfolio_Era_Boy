@@ -14,7 +14,7 @@ export default function About() {
           >
             <div className="aspect-[3/4] bg-text/5 rounded-2xl overflow-hidden">
               <img
-                src="./about-me.jpeg"
+                src="../assets/about-me.jpeg"
                 alt="Oshada Eranga"
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                 referrerPolicy="no-referrer"
