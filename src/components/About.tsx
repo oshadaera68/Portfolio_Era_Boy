@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import image from '@/assets/about-me.jpg'
 
 export default function About() {
   return (
@@ -14,7 +15,7 @@ export default function About() {
           >
             <div className="aspect-[3/4] bg-text/5 rounded-2xl overflow-hidden">
               <img
-                src="../assets/about-me.jpeg"
+                src={image}
                 alt="Oshada Eranga"
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                 referrerPolicy="no-referrer"
