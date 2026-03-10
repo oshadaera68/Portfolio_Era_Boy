@@ -14,6 +14,7 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('theme') as 'dark' | 'light') || 'dark';
@@ -27,6 +28,31 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-10% 0px -80% 0px',
+      threshold: 0,
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    NAV_ITEMS.forEach((item) => {
+      const element = document.getElementById(item.href.replace('#', ''));
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -50,8 +76,14 @@ export default function Navbar() {
     const targetId = href.replace('#', '');
     const elem = document.getElementById(targetId);
     if (elem) {
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = elem.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
       window.scrollTo({
-        top: elem.offsetTop - 80,
+        top: offsetPosition,
         behavior: 'smooth',
       });
     }
@@ -85,9 +117,20 @@ export default function Navbar() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="text-sm uppercase tracking-widest font-medium text-text/70 hover:text-accent transition-colors"
+              className={`text-sm uppercase tracking-widest font-medium transition-all relative ${
+                activeSection === item.href.replace('#', '') 
+                ? 'text-accent' 
+                : 'text-text/70 hover:text-accent'
+              }`}
             >
               {item.name}
+              {activeSection === item.href.replace('#', '') && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute -bottom-1 left-0 right-0 h-[2px] bg-accent"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
             </motion.a>
           ))}
           
@@ -132,7 +175,11 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="text-lg font-medium text-text/80 hover:text-accent"
+                  className={`text-lg font-medium transition-colors ${
+                    activeSection === item.href.replace('#', '') 
+                    ? 'text-accent' 
+                    : 'text-text/80 hover:text-accent'
+                  }`}
                 >
                   {item.name}
                 </a>
